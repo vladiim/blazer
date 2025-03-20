@@ -220,7 +220,9 @@ module Blazer
     end
 
     def schema
-      @schema = @data_source.schema
+      @schema = @data_source.schema.select do |table_info|
+        approved_tables.include?(table_info[:table])
+      end
     end
 
     def cancel

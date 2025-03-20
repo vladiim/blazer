@@ -34,6 +34,11 @@ module Blazer
 
     private
 
+    def approved_tables
+      ["visit_charges", "e_referrers", "financial_transactions", "turn_around_times"]
+    end
+    helper_method :approved_tables
+
     def process_vars(statement, var_params = nil)
       var_params ||= request.query_parameters
       (@bind_vars ||= []).concat(statement.variables).uniq!
