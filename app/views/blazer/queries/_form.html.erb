@@ -74,6 +74,7 @@
 <%= javascript_tag nonce: true do %>
   <%= blazer_js_var "variableParams", @variable_params %>
   <%= blazer_js_var "previewStatement", Blazer.data_sources.to_h { |k, v| [k, (v.preview_statement rescue "")] } %>
+  <%= blazer_js_var "unapprovedTables", @unapproved_tables %>
 
   var app = Vue.createApp({
     data: function() {
@@ -101,10 +102,26 @@
         this.error = false;
         cancelAllQueries();
 
-        var data = {statement: this.getSQL(), data_source: this.dataSource, variables: variableParams};
+        var sql = this.getSQL();
+        var foundUnapproved = [];
+        if (typeof unapprovedTables !== "undefined" && Array.isArray(unapprovedTables)) {
+          unapprovedTables.forEach(function(table) {
+            // Use a case-insensitive check. You might use a regex for more robust matching.
+            if (sql.toLowerCase().indexOf(table.toLowerCase()) !== -1) {
+              foundUnapproved.push(table);
+            }
+          });
+        }
+
+        if (foundUnapproved.length > 0) {
+          this.error = "Your query contains forbidden table(s): " + foundUnapproved.join(", ");
+          this.running = false;
+          return;
+        }
+
+        var data = {statement: sql, data_source: this.dataSource, variables: variableParams};
 
         var _this = this;
-
         runQuery(data, function (data) {
           _this.running = false;
           _this.showResults(data);

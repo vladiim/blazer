@@ -1,7 +1,8 @@
 module Blazer
   class QueriesController < BaseController
     before_action :set_query, only: [:show, :edit, :update, :destroy, :refresh]
-    before_action :set_data_source, only: [:tables, :docs, :schema, :cancel]
+    before_action :set_data_source, only: [:tables, :docs, :schema, :cancel, :new]
+    before_action :set_tables, only: [:schema, :new]
 
     def home
       set_queries(1000)
@@ -220,9 +221,18 @@ module Blazer
     end
 
     def schema
-      @schema = @data_source.schema.select do |table_info|
-        approved_tables.include?(table_info[:table])
-      end
+    end
+
+    def set_tables
+      all_schema = @data_source.schema
+      # Get an array of all table names from the schema.
+      all_table_names = all_schema.map { |table_info| table_info[:table] }
+      
+      # Calculate unapproved table names by subtracting the approved list.
+      @unapproved_tables = all_table_names - approved_tables
+
+      # Filter schema to only include approved tables.
+      @schema = all_schema.select { |table_info| approved_tables.include?(table_info[:table]) }
     end
 
     def cancel
@@ -233,7 +243,7 @@ module Blazer
     private
 
     def set_data_source
-      @data_source = Blazer.data_sources[params[:data_source]]
+      @data_source = Blazer.data_sources[params[:data_source] || 'main']
     rescue Blazer::Error => e
       raise unless e.message.start_with?("Unknown data source:")
       render plain: "Unknown data source", status: :not_found
