@@ -36,7 +36,7 @@ module Blazer
     end
 
     def statement_object
-      Statement.new(statement, data_source)
+      Statement.new(statement, data_source || "main")
     end
   end
 end

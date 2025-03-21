@@ -3,7 +3,7 @@ module Blazer
     attr_reader :statement, :data_source, :bind_statement, :bind_values
     attr_accessor :values
 
-    def initialize(statement, data_source = nil)
+    def initialize(statement, data_source = "main")
       @statement = statement
       @data_source = data_source.is_a?(String) ? Blazer.data_sources[data_source] : data_source
       @values = {}

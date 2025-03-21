@@ -7,6 +7,10 @@
     <%= f.label :name %>
     <%= f.text_field :name, class: "form-control" %>
   </div>
+  <div class="form-group">
+    <%= f.label :account %>
+    <%= f.select :account_id, Account.all.map { |account| [account.name, account.id] }, prompt: "Select an account" %>
+  </div>
   <div class="form-group" v-show="queries.length">
     <%= f.label :charts %>
     <ul id="queries" class="list-group">
@@ -31,7 +35,7 @@
 <% end %>
 
 <%= javascript_tag nonce: true do %>
-  <%= blazer_js_var "queries", Blazer::Query.active.named.order(:name).select("id, name").map { |q| {text: q.name, value: q.id} } %>
+  <%= blazer_js_var "queries", Blazer::Query.active.named.where(account_id: @dashboard.account_id).order(:name).select("id, name").map { |q| {text: q.name, value: q.id} } %>
   <%= blazer_js_var "dashboardQueries", @queries || @dashboard.dashboard_queries.order(:position).map(&:query) %>
 
   var app = Vue.createApp({

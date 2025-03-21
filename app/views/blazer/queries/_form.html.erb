@@ -21,13 +21,10 @@
             <a :href="schemaPath" target="_blank" style="margin-left: 40px;">Schema</a>
           </div>
 
-          <!-- Removed data source and table select markup -->
-          <!--
-          <%= f.select :data_source, Blazer.data_sources.map { |_, ds| [ds.name, ds.id] }, {}, class: ("hide" if Blazer.data_sources.size <= 1), style: "width: 140px;" %>
+          <%= f.select :data_source, Blazer.data_sources.map { |_, ds| [ds.name, ds.id] }, {}, class: "", style: "width: 140px;" %>
           <div id="tables" style="display: inline-block; width: 250px; margin-right: 10px;">
             <select id="table_names" style="width: 240px;" placeholder="Preview table"></select>
           </div>
-          -->
           <a v-on:click="run" v-if="!running" class="btn btn-info" style="vertical-align: top; width: 70px;">Run</a>
           <a v-on:click="cancel" v-if="running" class="btn btn-danger" style="vertical-align: top; width: 70px;">Cancel</a>
         </div>
@@ -36,6 +33,10 @@
         <div class="form-group">
           <%= f.label :name %>
           <%= f.text_field :name, class: "form-control" %>
+        </div>
+        <div class="form-group">
+          <%= f.label :account %>
+          <%= f.select :account_id, Account.all.map { |account| [account.name, account.id] }, prompt: "Select an account" %>
         </div>
         <div class="form-group">
           <%= f.label :description %>
